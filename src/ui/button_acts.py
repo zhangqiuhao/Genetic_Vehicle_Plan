@@ -7,9 +7,9 @@ import time
 import numpy
 
 from Genetic_Vehicle_Plan.GLOBAL_VARS import *
-from Genetic_Vehicle_Plan.QueuingAlgorithm import Ui_Form
-from Genetic_Vehicle_Plan.vpga import *
-from Genetic_Vehicle_Plan.input import *
+from .QueuingAlgorithm import Ui_Form
+from ..core.vpga import *
+from ..input.input import *
 
 
 class button_load(QThread):
@@ -41,7 +41,7 @@ class button_load(QThread):
 
 
 class button_run(QThread):
-    signal = pyqtSignal(list, list)
+    signal = pyqtSignal(list)
 
     def __init__(self,
                  vehicle_data,

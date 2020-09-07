@@ -1,16 +1,5 @@
-import sys
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-import time
-import numpy
 
-from Genetic_Vehicle_Plan.GLOBAL_VARS import *
-from Genetic_Vehicle_Plan.QueuingAlgorithm import Ui_Form
-from Genetic_Vehicle_Plan.vpga import *
-from Genetic_Vehicle_Plan.input import *
-from Genetic_Vehicle_Plan.button_acts import *
+from Genetic_Vehicle_Plan.src.ui.button_acts import *
 
 
 # noinspection PyAttributeOutsideInit
@@ -60,7 +49,7 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
 
         # Click action
         self.toolButton.clicked.connect(lambda: self.button_load())
-        self.toolButton_4.clicked.connect(lambda: self.button_run())
+        self.toolButton_4.clicked.connect(lambda: self.run())
 
     def button_load(self):
         self.site_data = []
@@ -95,7 +84,6 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         self.thread.signal.connect(self.callback_run)
         self.thread.start()
 
-        '''
         positives = [y for x in self.err for y in x if y >= 0]
         negatives = [y for x in self.err for y in x if y < 0]
         print(self.solution)
@@ -104,8 +92,6 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
                                                                                      lost=sum(negatives)))
         # After the generations complete, some plots are showed that summarize the how the outputs/fitenss values evolve over generations.
         self.plot_result()
-
-        '''
 
     def callback_run(self, msg):
         [self.solution,
@@ -223,6 +209,9 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         ax.plot(x, y)
         self.canvas.draw()
 
+        for vehicles in self.current_vehicle_state:
+            pass
+
     def run(self):
         self.site_input = []
         self.vehicle_input = []
@@ -253,8 +242,8 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         solution_fitness, \
         solution_idx, \
         err, \
-        current_site_data, \
-        current_vehicle_state, \
+        self.current_site_data, \
+        self.current_vehicle_state, \
         self.best_solutions_fitness \
             = ga_instance.best_solution()
 

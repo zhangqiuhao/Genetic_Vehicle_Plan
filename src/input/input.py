@@ -1,6 +1,6 @@
 import numpy
 import datetime
-from Genetic_Vehicle_Plan.vehicle_timetable import t_rank
+from ..core.vehicle_timetable import t_rank
 
 
 class site_data_input:

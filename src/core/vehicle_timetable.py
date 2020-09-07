@@ -1,9 +1,8 @@
 import numpy
 import datetime
 import copy
-import operator
 
-STATE_LIST = ['OT', 'ZT', 'ST', 'DT', 'UT', 'HT']
+from ...GLOBAL_VARS import STATE_LIST
 STATE_LIST_LENGTH = len(STATE_LIST)
 
 

@@ -3,10 +3,9 @@ import random
 import matplotlib.pyplot
 import pickle
 import time
-from Genetic_Vehicle_Plan.vehicle_timetable import *
+from ..core.vehicle_timetable import *
 import multiprocessing
-
-CORE_NUMBER = 6
+from ...GLOBAL_VARS import CORE_NUMBER
 
 
 class GA:
