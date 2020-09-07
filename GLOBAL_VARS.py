@@ -1,5 +1,7 @@
 SITE_DATA = 'data/2020-08-31.csv'
 VEHICLE_DATA = 'data/vehicle_state.txt'
+SITE_HEADER = ["任务单号", "工地名称", "方量", "开盘时间", "运距", "缓冲时间", "初凝时间", "惩罚系数"]
+VEHICLE_HEADER = ["车号", "状态", "容积", "位置", "正在派送", "时间", "排队任务"]
 STATE_LIST = ['OT', 'ZT', 'ST', 'DT', 'UT', 'HT']
 SELECTION = ['sss', 'rws', 'sus', 'random', 'tournament', 'rank']
 CROSSOVER = ['pmx', 'ox', 'cx']

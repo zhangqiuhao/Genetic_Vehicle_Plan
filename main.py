@@ -1,4 +1,4 @@
-
+import matplotlib.pyplot as plt
 from Genetic_Vehicle_Plan.src.ui.button_acts import *
 
 
@@ -8,8 +8,6 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         super(Ui_Form, self).__init__()
         self.setupUi(self)
         self.num_genes = []
-        self.site_data = []
-        self.vehicle_data = []
         self.site_input = []
         self.vehicle_input = []
         self.err = []
@@ -17,8 +15,6 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         self.solution_fitness = []
         self.average_vehicle_cubic = float
 
-        self.site_table_header = ["任务单号", "工地名称", "方量", "开盘时间", "运距", "缓冲时间", "初凝时间", "惩罚系数"]
-        self.vehicle_table_header = ["车号", "状态", "容积", "位置", "任务单号", "时间"]
         self.create_site_table_header()
         self.create_vehicle_table_header()
 
@@ -31,7 +27,7 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         self.lineEdit_2.setFont(font)
         self.lineEdit_3.setText('0.001')
         self.lineEdit_3.setFont(font)
-        self.lineEdit_5.setText('200')
+        self.lineEdit_5.setText('5')
         self.lineEdit_5.setFont(font)
         self.lineEdit_6.setText('20')
         self.lineEdit_6.setFont(font)
@@ -106,8 +102,8 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         # ======================给site table设置行列表头============================
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.tableWidget.setColumnCount(len(self.site_table_header))
-        self.tableWidget.setHorizontalHeaderLabels(self.site_table_header)
+        self.tableWidget.setColumnCount(len(SITE_HEADER))
+        self.tableWidget.setHorizontalHeaderLabels(SITE_HEADER)
         self.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.tableWidget.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
@@ -123,14 +119,15 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         # ======================给vehicle table设置行列表头============================
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.tableWidget_2.setColumnCount(len(self.vehicle_table_header))
-        self.tableWidget_2.setHorizontalHeaderLabels(self.vehicle_table_header)
+        self.tableWidget_2.setColumnCount(len(VEHICLE_HEADER))
+        self.tableWidget_2.setHorizontalHeaderLabels(VEHICLE_HEADER)
         self.tableWidget_2.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.tableWidget_2.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.tableWidget_2.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.tableWidget_2.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
-        self.tableWidget_2.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
+        self.tableWidget_2.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
         self.tableWidget_2.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
+        self.tableWidget_2.horizontalHeader().setSectionResizeMode(6, QHeaderView.Stretch)
         headitem = self.tableWidget_2.horizontalHeader()
         headitem.setFont(font)
 
@@ -144,7 +141,7 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
 
         # ================遍历表格每个元素，同时添加到tablewidget中========================
         for i in range(len(self.site_data)):
-            for j in range(len(self.site_table_header)):
+            for j in range(len(SITE_HEADER)):
                 newItem = QTableWidgetItem(self.site_data[i][j])
                 newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tableWidget.setItem(i, j, newItem)
@@ -164,7 +161,7 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
 
         # ================遍历表格每个元素，同时添加到tablewidget中========================
         for i in range(len(self.vehicle_data)):
-            for j in range(len(self.vehicle_table_header)):
+            for j in range(len(VEHICLE_HEADER)-1):
                 newItem = QTableWidgetItem(self.vehicle_data[i][j])
                 newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tableWidget_2.setItem(i, j, newItem)
@@ -175,9 +172,10 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         self.tableWidget_2.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def load_vehicle_data(self):
+        self.vehicle_input = []
         for i in range(len(self.vehicle_data)):
             line = []
-            for j in range(len(self.vehicle_table_header)):
+            for j in range(len(VEHICLE_HEADER)-1):
                 line.append(self.tableWidget_2.item(i, j).text())
             _ = vehicle_state_input(line)
             self.vehicle_input.append(_)
@@ -185,9 +183,10 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         self.average_vehicle_cubic = numpy.average(numpy.asarray([int(x.cubic) for x in self.vehicle_input]))
 
     def load_site_data(self):
+        self.site_input = []
         for i in range(len(self.site_data)):
             line = []
-            for j in range(len(self.site_table_header)):
+            for j in range(len(SITE_HEADER)):
                 line.append(self.tableWidget.item(i, j).text())
             line.append(self.average_vehicle_cubic)
             _ = site_data_input(line)
@@ -197,24 +196,7 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
         print('There are {num_car} vehicles available, the total planned cubic is {cubic_total}'
               .format(num_car=len(self.vehicle_data), cubic_total=cubic_total))
 
-    def plot_result(self, title="Iteration vs. Time Costs", xlabel="Generation", ylabel="Time Costs", linewidth=3):
-        """
-        Creates and shows a plot that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation.
-        If no generation is completed, an exception is raised.
-        """
-        ax = self.fig.add_subplot(111)
-        x = range(len(self.best_solutions_fitness))
-        y = 1 / numpy.asarray(self.best_solutions_fitness)
-        ax.cla()  # TODO:删除原图，让画布上只有新的一次的图
-        ax.plot(x, y)
-        self.canvas.draw()
-
-        for vehicles in self.current_vehicle_state:
-            pass
-
     def run(self):
-        self.site_input = []
-        self.vehicle_input = []
         # Input vehicle and site data from table
         self.load_vehicle_data()
         self.load_site_data()
@@ -249,15 +231,43 @@ class Ui_Form(QtWidgets.QDialog, Ui_Form):
 
         positives = [y for x in err for y in x if y >= 0]
         negatives = [y for x in err for y in x if y < 0]
-        print(solution)
-        print(solution_fitness)
-        print("The total delay on site: {delay}, total lost for camp: {lost}".format(delay=sum(positives),
-                                                                                     lost=sum(negatives)))
+        self.label_16.setText("总损失时间：{solution_fitness}, 工地等待总时间: {delay}, 车辆等待总时间: {lost}".format(
+            solution_fitness=int(solution_fitness),
+            delay=sum(positives),
+            lost=sum(negatives)))
         # After the generations complete, some plots are showed that summarize the how the outputs/fitenss values evolve over generations.
         self.plot_result()
 
+    def plot_result(self, title="Iteration vs. Time Costs", xlabel="Generation", ylabel="Time Costs", linewidth=3):
+        """
+        Creates and shows a plot that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation.
+        If no generation is completed, an exception is raised.
+        """
+        self.fig.clear()
+        ax = self.fig.add_subplot(111)
+        x = range(len(self.best_solutions_fitness))
+        y = 1 / numpy.asarray(self.best_solutions_fitness)
+        ax.cla()  # TODO:删除原图，让画布上只有新的一次的图
+        ax.plot(x, y)
+        self.canvas.draw()
+
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        for i, vehicles in enumerate(self.current_vehicle_state):
+            order_str = ""
+            for order in vehicles.order_num:
+                if order != 'None':
+                    order_str += order + ';'
+            newItem = QTableWidgetItem(order_str)
+            newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tableWidget_2.setItem(i, 6, newItem)
+            newItem.setFont(font)
+            pass
+
 
 if __name__ == '__main__':
+    import sys
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     # 创建QApplication类实例，用来获得参数
     app = QApplication(sys.argv)
     # 创建一个窗口
